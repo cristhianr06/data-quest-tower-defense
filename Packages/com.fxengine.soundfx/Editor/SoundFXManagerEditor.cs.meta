@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: faacb95b29344d859703b3c42698ed07
+timeCreated: 1767394074
+AssetOrigin:
+  serializedVersion: 1
+  productId: 359522
+  packageName: SoundFX
+  packageVersion: 1.0.1
+  assetPath: Packages/com.fxengine.soundfx/Editor/SoundFXManagerEditor.cs
+  uploadId: 876404

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8ba9db84e910e3b4f960952d6f4206b6
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 275545
+  packageName: EasyPooling v2025
+  packageVersion: 2025.1
+  assetPath: Assets/GUPS/EasyPooling/Demos/Demo_A_BlackHole/Source/Asteroids/AsteroidSpawner.cs
+  uploadId: 789474

@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 3ae5b7b52466433eacd59a99b89f9b83
+timeCreated: 1767371363
+AssetOrigin:
+  serializedVersion: 1
+  productId: 359522
+  packageName: SoundFX
+  packageVersion: 1.0.1
+  assetPath: Packages/com.fxengine.soundfx/Runtime/SoundFlags.cs
+  uploadId: 876404

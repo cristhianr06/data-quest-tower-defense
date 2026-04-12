@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 9c86bee48e1b3324aabb31afd68b0fb8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 275545
+  packageName: EasyPooling v2025
+  packageVersion: 2025.1
+  assetPath: Assets/GUPS/EasyPooling/Demos/Demo_A_BlackHole/Source/Asteroids/Asteroid.cs
+  uploadId: 789474

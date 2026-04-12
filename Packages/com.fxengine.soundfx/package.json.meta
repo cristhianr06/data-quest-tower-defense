@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: ad51fb7a8457b0e4f93264b65cb4eb4c
+PackageManifestImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 359522
+  packageName: SoundFX
+  packageVersion: 1.0.1
+  assetPath: Packages/com.fxengine.soundfx/package.json
+  uploadId: 876404

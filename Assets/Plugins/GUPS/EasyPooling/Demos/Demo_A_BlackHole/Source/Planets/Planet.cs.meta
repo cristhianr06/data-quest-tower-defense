@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 954fce5ce3c9c594d8b22c56d0915d05
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 275545
+  packageName: EasyPooling v2025
+  packageVersion: 2025.1
+  assetPath: Assets/GUPS/EasyPooling/Demos/Demo_A_BlackHole/Source/Planets/Planet.cs
+  uploadId: 789474

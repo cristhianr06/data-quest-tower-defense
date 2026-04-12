@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: dcdcf68c960a4f6dbe2229980b7b6317
+timeCreated: 1769646678
+AssetOrigin:
+  serializedVersion: 1
+  productId: 359522
+  packageName: SoundFX
+  packageVersion: 1.0.1
+  assetPath: Packages/com.fxengine.soundfx/Runtime/ISoundFXPlayable.cs
+  uploadId: 876404

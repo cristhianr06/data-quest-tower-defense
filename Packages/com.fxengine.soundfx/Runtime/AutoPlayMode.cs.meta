@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 7c0affef896e4cb4b1593cc0128520ef
+timeCreated: 1767331460
+AssetOrigin:
+  serializedVersion: 1
+  productId: 359522
+  packageName: SoundFX
+  packageVersion: 1.0.1
+  assetPath: Packages/com.fxengine.soundfx/Runtime/AutoPlayMode.cs
+  uploadId: 876404

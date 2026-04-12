@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1b1e441de66dce24bae58ef4f21590da
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 359522
+  packageName: SoundFX
+  packageVersion: 1.0.1
+  assetPath: Packages/com.fxengine.soundfx/Resources/SoundFX Default 3D Settings.asset
+  uploadId: 876404

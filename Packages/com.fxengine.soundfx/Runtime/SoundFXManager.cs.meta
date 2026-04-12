@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8d7b6f9a2a574f299e03d56b4a591bda
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 359522
+  packageName: SoundFX
+  packageVersion: 1.0.1
+  assetPath: Packages/com.fxengine.soundfx/Runtime/SoundFXManager.cs
+  uploadId: 876404

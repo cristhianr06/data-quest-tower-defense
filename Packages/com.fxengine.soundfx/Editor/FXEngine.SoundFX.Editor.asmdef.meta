@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 5037fc6eedc0404eb25b76b68b459abe
+timeCreated: 1767339009
+AssetOrigin:
+  serializedVersion: 1
+  productId: 359522
+  packageName: SoundFX
+  packageVersion: 1.0.1
+  assetPath: Packages/com.fxengine.soundfx/Editor/FXEngine.SoundFX.Editor.asmdef
+  uploadId: 876404

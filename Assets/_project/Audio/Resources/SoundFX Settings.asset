@@ -1,0 +1,16 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b0103c3a6e14f7fb3485bee7d273f39, type: 3}
+  m_Name: SoundFX Settings
+  m_EditorClassIdentifier: FXEngine.SoundFX::FXEngine.SoundFX.SoundFXSettings
+  DefaultOutput: {fileID: 24300002, guid: ea51ace715e9e984787f4cfb65a152ff, type: 2}
+  Default3DSettings: {fileID: 11400000, guid: 1b1e441de66dce24bae58ef4f21590da, type: 2}

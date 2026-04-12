@@ -1,0 +1,14 @@
+{
+    "name": "FXEngine.SoundFX",
+    "rootNamespace": "FXEngine.SoundFX",
+    "references": [],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

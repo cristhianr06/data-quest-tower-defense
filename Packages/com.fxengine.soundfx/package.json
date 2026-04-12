@@ -1,0 +1,22 @@
+{
+    "name": "com.fxengine.soundfx",
+    "version": "1.0.1",
+    "displayName": "SoundFX",
+    "description": "Enhanced AudioSource.",
+    "unity": "6000.0",
+    "dependencies": { },
+    "keywords": [
+        "Audio",
+        "AudioSource",
+        "Sound",
+        "Pooling",
+        "FX"
+    ],
+    "samples": [
+        {
+            "displayName": "Samples",
+            "description": "",
+            "path": "Samples~/Samples"
+        }
+    ]
+}

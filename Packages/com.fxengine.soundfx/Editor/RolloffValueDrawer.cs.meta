@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: 75e333119e9e4028b5880a4939b688e1
+timeCreated: 1767340939
+AssetOrigin:
+  serializedVersion: 1
+  productId: 359522
+  packageName: SoundFX
+  packageVersion: 1.0.1
+  assetPath: Packages/com.fxengine.soundfx/Editor/RolloffValueDrawer.cs
+  uploadId: 876404

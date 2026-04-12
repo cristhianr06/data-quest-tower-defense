@@ -28,7 +28,7 @@
 
 ## 🛠️ Prerequisitos para usar este proyecto
 
-- Si no tienes Git instalado, descárgalo desde este [link](https://git-scm.com/) y sigue el proceso de instalación.
+- Si no tienes Git instalado, descárgalo desde este <a href="https://git-scm.com/" target="_blank">link</a> y sigue el proceso de instalación.
 - Durante la instalación, haz clic en **Next** hasta que encuentres la opción **Override the default branch name for new repositories**, actívala y continúa sin cambiar ninguna otra configuración.
 - Al terminar la instalación, necesitas asociar tu nombre y correo a Git. En Windows, abre la terminal **CMD** y ejecuta los siguientes comandos:
 
@@ -50,7 +50,7 @@ git clone https://github.com/cristhianr06/data-quest-tower-defense.git
 El proyecto comenzará a descargarse. Cuando termine, la terminal volverá a mostrar `c:\proyectos_unity>`.
 
 - Descarga **Visual Studio 2022 Community** desde este [link](https://aka.ms/vs/17/release/vs_community.exe). Al ejecutar el instalador, ve a la sección **Juegos**, activa **Desarrollo de juego con Unity** y haz clic en **Instalar**. Espera a que finalice.
-- Descarga Unity Hub desde este [link](https://unity.com/download) e instálalo.
+- Descarga Unity Hub desde este <a href="https://unity.com/download" target="_blank">link</a> e instálalo.
 - Abre Unity Hub e inicia sesión con tu cuenta Unity. Si aún no tienes una, créala en el momento.
 - Una vez dentro, ve al apartado **Licenses**. Si no tienes una licencia activa, haz clic en **Add license**, selecciona **Get a free personal license** y acepta los términos con **Agree and get personal edition license**.
 - En la sección **Projects**, haz clic en **Add** → **Add project from disk**. Navega hasta la carpeta que creaste y selecciona la carpeta del proyecto **data-quest-tower-defense**. Haz clic en **Open**.

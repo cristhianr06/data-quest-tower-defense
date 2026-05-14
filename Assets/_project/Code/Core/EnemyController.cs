@@ -26,6 +26,7 @@ public class EnemyController : MonoBehaviour, IPoolable
     {
         enemyAnimation.PlayWalkingAnim();
         _enemyHealth.healthBar.fillAmount = 1f;
+        _enemyHealth.currentHealth = enemyData.maxHealth;
         _enemyMovement.EnemyArrived += EnemyDespawn;
         _enemyMovement.EnemyArrived += EnemyCounterWave.Instance.OnReduceEnemies;
         _enemyHealth.OnDead += DisableEnemy;

@@ -28,7 +28,11 @@ public class EnemyHealth : MonoBehaviour, IDamage
         if(currentHealth <= 0f)
         {
             _isDied = true;
+
+            PlayerEconomy.Instance.AddGold(enemyData.goldReward);
+
             _enemyAnimation.DeadAnimation();
+
             OnDead?.Invoke();
         }
     }

@@ -54,6 +54,7 @@ public class EnemyMovement : MonoBehaviour
                 Debug.Log($"Llego: {gameObject.name}");
                 _isArrived = true;
                 EnemyArrived?.Invoke(1);
+                CoreHealth.Instance.TakeDamage(_enemyData.damageToCore);
                 return;
             }
             _currentWaypointIndex++;

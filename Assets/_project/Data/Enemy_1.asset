@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 562175bdc74e28b409bbb68d2084397d, type: 3}
   m_Name: Enemy_1
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDataSO
+  enemyType: 1
   maxHealth: 100
-  moveSpeed: 1
+  moveSpeed: 1.5
+  rotationSpeed: 2
   toleranceDistance: 0.1
-  rotationSpeed: 1
+  goldReward: 10
+  damageToCore: 10
+  attackResistance: 10
+  deathSFX: {fileID: 8300000, guid: 4ddf5cea35950164388707d53947bd46, type: 3}
+  deathFX: {fileID: 6777932572600773440, guid: 47f46edf5b4392c48ad75011d064daed, type: 3}

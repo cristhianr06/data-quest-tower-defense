@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class EnemyHealth : MonoBehaviour, IDamage
 {
     public EnemyDataSO enemyData;
-    public Image healthBar;
+    public Slider healthBar;
     public event Action OnDead;
 
     public float currentHealth;
@@ -22,10 +22,9 @@ public class EnemyHealth : MonoBehaviour, IDamage
     {
         if (_isDied) return;
         currentHealth -= damage;
-        currentHealth = Mathf.Max(currentHealth, 0);
-        healthBar.fillAmount = currentHealth / enemyData.maxHealth;
+        healthBar.value = currentHealth;
 
-        if(currentHealth <= 0f)
+        if(currentHealth <= 0.0f)
         {
             _isDied = true;
 

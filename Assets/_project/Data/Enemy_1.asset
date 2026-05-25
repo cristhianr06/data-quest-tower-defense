@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Enemy_1
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDataSO
   enemyType: 1
-  maxHealth: 100
+  maxHealth: 50
   moveSpeed: 1.5
   rotationSpeed: 2
   toleranceDistance: 0.1

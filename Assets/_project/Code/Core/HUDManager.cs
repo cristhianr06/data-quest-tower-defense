@@ -7,6 +7,7 @@ public class HUDManager : MonoBehaviour
 
     private void Start()
     {
+        goldText.text = ("100");
         PlayerEconomy.Instance.OnGoldChanged += UpdateGold;
     }
 

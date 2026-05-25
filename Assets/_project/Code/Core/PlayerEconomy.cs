@@ -5,7 +5,7 @@ public class PlayerEconomy : MonoBehaviour
 {
     public static PlayerEconomy Instance;
 
-    public int startGold = 300;
+    public int startGold = 100;
 
     public int CurrentGold { get; private set; }
 

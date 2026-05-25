@@ -16,6 +16,7 @@ public class EnemyController : MonoBehaviour, IPoolable
         _wait = new WaitForSeconds(delayDisable);
         _enemyHealth = GetComponent<EnemyHealth>();
         _enemyMovement = GetComponent<EnemyMovement>();
+        _enemyHealth.healthBar.maxValue = enemyData.maxHealth;
     }
     private void EnemyDespawn(int count)
     {
@@ -25,7 +26,7 @@ public class EnemyController : MonoBehaviour, IPoolable
     public void OnSpawn()
     {
         enemyAnimation.PlayWalkingAnim();
-        _enemyHealth.healthBar.fillAmount = 1f;
+        _enemyHealth.healthBar.value = enemyData.maxHealth;
         _enemyHealth.currentHealth = enemyData.maxHealth;
         _enemyMovement.EnemyArrived += EnemyDespawn;
         _enemyMovement.EnemyArrived += EnemyCounterWave.Instance.OnReduceEnemies;

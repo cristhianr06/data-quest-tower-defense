@@ -13,7 +13,7 @@ public class EnemyDataSO : ScriptableObject
 
     [Header("Rewards")]
     public int goldReward;
-    public int damageToCore;
+    public float damageToCore;
 
     [Header("Combat")]
     public float attackResistance;

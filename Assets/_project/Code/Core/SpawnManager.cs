@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using Lean.Pool;
 using EditorAttributes;
+using TMPro;
 
 public class SpawnManager : MonoBehaviour
 {
+    public TextMeshProUGUI counterWaveTMP;
     public static SpawnManager Instance;
 
     [Header("Wave Config")]
@@ -47,6 +49,7 @@ public class SpawnManager : MonoBehaviour
             return;
 
         _counterWave++;
+        counterWaveTMP.text = $"Oleada: {CurrentQueueCount.ToString()}";
 
         if (_counterWave > listWave.Length - 1)
         {
@@ -91,8 +94,6 @@ public class SpawnManager : MonoBehaviour
         {
             _enemyQueue.Clear();
         }
-
-        // AQUÍ TENÍAS EL BUG
         EnemyCounterWave.Instance.endCurrentWave -= NextWave;
     }
 }

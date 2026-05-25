@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Tower_cannon
   m_EditorClassIdentifier: Assembly-CSharp::TowerDataSO
   towerName: cannon
-  damage: 10
+  damage: 60
   fireRate: 1
   range: 2.5
-  cost: 100
+  cost: 125
   projectilePrefab: {fileID: 4029408703108834817, guid: f9e2dab568c7d8a4493fbfbba6241526, type: 3}
   shootSFX: {fileID: 8300000, guid: ed167a2b21a15ff489542578edb5ac3d, type: 3}

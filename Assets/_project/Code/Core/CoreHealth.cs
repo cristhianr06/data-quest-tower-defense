@@ -1,17 +1,16 @@
 using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class CoreHealth : MonoBehaviour
 {
     public static CoreHealth Instance;
 
-    public int maxHealth = 20;
+    public float maxHealth = 100f;
 
-    public int currentHealth;
+    public float currentHealth;
 
-    public Image healthBar;
+    public Slider healthBar;
 
     public event Action OnGameOver;
 
@@ -22,19 +21,17 @@ public class CoreHealth : MonoBehaviour
 
     private void Start()
     {
+        healthBar.maxValue = maxHealth;
         currentHealth = maxHealth;
         UpdateUI();
     }
 
-    public void TakeDamage(int damage)
+    public void TakeDamage(float damage)
     {
         currentHealth -= damage;
-
-        currentHealth = Mathf.Max(currentHealth, 0);
-
         UpdateUI();
 
-        if (currentHealth <= 0)
+        if (currentHealth <= 0.0f)
         {
             OnGameOver?.Invoke();
         }
@@ -42,6 +39,6 @@ public class CoreHealth : MonoBehaviour
 
     private void UpdateUI()
     {
-        healthBar.fillAmount = (float)currentHealth / maxHealth;
+        healthBar.value = currentHealth;
     }
 }

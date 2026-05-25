@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Tower_ballista
   m_EditorClassIdentifier: Assembly-CSharp::TowerDataSO
   towerName: ballista
-  damage: 10
+  damage: 50
   fireRate: 0.8
-  range: 2.5
-  cost: 50
+  range: 2.8
+  cost: 75
   projectilePrefab: {fileID: 8490014886952267208, guid: 3376dfee8ddc8364eb39307cfab5660c, type: 3}
   shootSFX: {fileID: 8300000, guid: ed167a2b21a15ff489542578edb5ac3d, type: 3}

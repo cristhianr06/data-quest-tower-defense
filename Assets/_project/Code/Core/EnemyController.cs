@@ -1,52 +1,166 @@
-using Lean.Pool;
+using System;
 using System.Collections;
+using Lean.Pool;
 using UnityEngine;
 
 public class EnemyController : MonoBehaviour, IPoolable
 {
-    public EnemyDataSO enemyData;
+    public event Action<EnemyController> OnEnemyRemoved;
+
+    [Header("Enemy Config")]
+    public EnemyType enemyType;
+
+    public GameObject enemyArea;
+
     public float delayDisable = 2f;
-    private EnemyMovement _enemyMovement;
+
     public EnemyAnimation enemyAnimation;
-    
-    private EnemyHealth _enemyHealth;
-    private WaitForSeconds _wait;
+
+    // =========================================================
+    // RUNTIME
+    // =========================================================
+
+    public EnemyDataSO EnemyData { get; private set; }
+
+    public int EnemyId { get; private set; }
+
+    public string DisplayName { get; private set; }
+
+    // =========================================================
+    // COMPONENTS
+    // =========================================================
+
+    private EnemyMovement enemyMovement;
+
+    private EnemyHealth enemyHealth;
+
+    private WaitForSeconds wait;
+
+
+    // =========================================================
+    // UNITY
+    // =========================================================
+
     private void Awake()
     {
-        _wait = new WaitForSeconds(delayDisable);
-        _enemyHealth = GetComponent<EnemyHealth>();
-        _enemyMovement = GetComponent<EnemyMovement>();
-        _enemyHealth.healthBar.maxValue = enemyData.maxHealth;
+        wait =
+            new WaitForSeconds(delayDisable);
+
+        enemyMovement =
+            GetComponent<EnemyMovement>();
+
+        enemyHealth =
+            GetComponent<EnemyHealth>();
     }
-    private void EnemyDespawn(int count)
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
+    public void Initialize(
+        int id,
+        string enemyBaseName)
     {
-        LeanPool.Despawn(this);
+        EnemyId = id;
+
+        DisplayName =
+            $"{enemyBaseName}_{id}";
+
+        gameObject.name = DisplayName;
+
+        // =====================================================
+        // DICTIONARY LOOKUP
+        // =====================================================
+
+        EnemyData =
+            EnemyDatabase.Instance
+                .GetEnemyData(enemyType);
+
+        if (EnemyData == null)
+        {
+            Debug.LogError(
+                $"EnemyData missing for {enemyType}");
+
+            return;
+        }
+
+        // =====================================================
+        // INITIALIZE SYSTEMS
+        // =====================================================
+
+        enemyMovement.Initialize(EnemyData);
+
+        enemyHealth.Initialize(EnemyData);
+
+        // =====================================================
+        // REGISTER EVENTS
+        // =====================================================
+
+        enemyHealth.OnDead -= DisableEnemy;
+        enemyHealth.OnDead += DisableEnemy;
+
+        enemyMovement.EnemyArrived -= EnemyArrived;
+        enemyMovement.EnemyArrived += EnemyArrived;
+
+        // =====================================================
+        // VISUALS
+        // =====================================================
+
+        enemyAnimation.PlayWalkingAnim();
+
+        Debug.Log(
+            $"LOOKUP SUCCESS -> {enemyType}");
     }
+
+    // =========================================================
+    // POOL
+    // =========================================================
 
     public void OnSpawn()
     {
-        enemyAnimation.PlayWalkingAnim();
-        _enemyHealth.healthBar.value = enemyData.maxHealth;
-        _enemyHealth.currentHealth = enemyData.maxHealth;
-        _enemyMovement.EnemyArrived += EnemyDespawn;
-        _enemyMovement.EnemyArrived += EnemyCounterWave.Instance.OnReduceEnemies;
-        _enemyHealth.OnDead += DisableEnemy;
+        // LeanPool llama esto ANTES de Initialize()
+        // No registrar lógica aquí.
     }
+
     public void OnDespawn()
     {
-        _enemyHealth._isDied = false;
-        _enemyMovement.ResetEnemy();
-        _enemyMovement.EnemyArrived -= EnemyDespawn;
-        _enemyMovement.EnemyArrived -= EnemyCounterWave.Instance.OnReduceEnemies;
-        _enemyHealth.OnDead -= DisableEnemy;
+        enemyHealth.OnDead -= DisableEnemy;
+
+        enemyMovement.EnemyArrived -= EnemyArrived;
+
+        enemyMovement.ResetEnemy();
+
+        StopAllCoroutines();
     }
-    public void DisableEnemy()
+
+    // =========================================================
+    // ARRIVED
+    // =========================================================
+
+    private void EnemyArrived()
     {
-        StartCoroutine(DisableEnemyCoroutine());
+        OnEnemyRemoved?.Invoke(this);
+
+        LeanPool.Despawn(gameObject);
     }
+
+    // =========================================================
+    // DEAD
+    // =========================================================
+
+    private void DisableEnemy(
+        EnemyHealth enemyHealth)
+    {
+        StartCoroutine(
+            DisableEnemyCoroutine());
+    }
+
     private IEnumerator DisableEnemyCoroutine()
     {
-        yield return _wait;
-        LeanPool.Despawn(this);
+        yield return wait;
+
+        OnEnemyRemoved?.Invoke(this);
+
+        LeanPool.Despawn(gameObject);
     }
 }

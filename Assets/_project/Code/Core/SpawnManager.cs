@@ -1,13 +1,18 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Lean.Pool;
-using EditorAttributes;
 using TMPro;
 
 public class SpawnManager : MonoBehaviour
 {
+    [SerializeField] private float delayStartFirstWave = 2f;
+
+    [SerializeField] private float delayBetweenWaves = 5f;
+
     public TextMeshProUGUI counterWaveTMP;
+
     public static SpawnManager Instance;
 
     [Header("Wave Config")]
@@ -20,80 +25,234 @@ public class SpawnManager : MonoBehaviour
 
     private WaitForSeconds _wait;
 
-    private int _counterWave = -1;
+    private WaitForSeconds _waitBetweenWaves;
 
-    // PROPIEDAD PARA UI
-    public int CurrentQueueCount => _enemyQueue != null ? _enemyQueue.Count : 0;
+    private WaitForSeconds _waitFirstWave;
+
+    private int _currentWaveIndex = 0;
+
+    private int _enemyIdCounter = 0;
+
+    private int _enemyAmountWave;
+
+    // =========================================================
+    // ACTIVE ENEMIES
+    // =========================================================
+
+    private int _currentAliveEnemies = 0;
+
+    // =========================================================
+    // EVENTS
+    // =========================================================
+
+    public event Action<List<string>, int, int> OnQueueCreated;
+
+    public event Action OnEnemyDequeued;
+
+    public event Action OnQueueCleared;
 
     private void Awake()
     {
         Instance = this;
+
+        _waitBetweenWaves =
+            new WaitForSeconds(delayBetweenWaves);
+
+        _waitFirstWave =
+            new WaitForSeconds(delayStartFirstWave);
     }
 
     private void Start()
     {
-        EnemyCounterWave.Instance.endCurrentWave += NextWave;
-
-        PrepareWave();
+        StartCoroutine(PrepareWaveRoutine());
     }
 
-    [Button("Iniciar")]
-    public void PrepareWave()
+    private IEnumerator PrepareWaveRoutine()
     {
+        yield return _waitFirstWave;
+
         NextWave();
     }
 
+    private IEnumerator NextWaveDelayRoutine()
+    {
+        yield return _waitBetweenWaves;
+
+        NextWave();
+    }
+
+    // =========================================================
+    // NEXT WAVE
+    // =========================================================
+
     private void NextWave()
     {
+        _enemyAmountWave = 0;
+
         if (listWave == null || listWave.Length == 0)
             return;
 
-        _counterWave++;
-        counterWaveTMP.text = $"Oleada: {CurrentQueueCount.ToString()}";
-
-        if (_counterWave > listWave.Length - 1)
+        if (_currentWaveIndex >= listWave.Length)
         {
-            Debug.Log("Todas las oleadas completadas");
+            Debug.Log("ALL WAVES COMPLETED");
             return;
         }
 
-        Debug.Log($"Counter Wave: {_counterWave}");
+        counterWaveTMP.text =
+            $"Oleada: {_currentWaveIndex + 1}";
 
-        // QUEUE
+        // =========================================================
+        // CREATE FIFO QUEUE
+        // =========================================================
+
         _enemyQueue = new Queue<GameObject>(
-            listWave[_counterWave].enemiesInWave);
+            listWave[_currentWaveIndex].enemiesInWave);
 
         _wait = new WaitForSeconds(
-            listWave[_counterWave].spawnInterval);
+            listWave[_currentWaveIndex].spawnInterval);
+
+        _enemyAmountWave = _enemyQueue.Count;
+
+        // =========================================================
+        // BUILD UI SNAPSHOT
+        // =========================================================
+
+        List<string> queueSnapshot =
+            BuildQueueSnapshot();
+
+        OnQueueCreated?.Invoke(
+            queueSnapshot,
+            _currentWaveIndex,
+            _enemyAmountWave);
 
         StartCoroutine(SpawnRoutine());
+
+        _currentWaveIndex++;
     }
+
+    // =========================================================
+    // SPAWN ROUTINE
+    // =========================================================
 
     private IEnumerator SpawnRoutine()
     {
-        EnemyCounterWave.Instance.amountCurrentWave = _enemyQueue.Count;
-
         while (_enemyQueue.Count > 0)
         {
-            GameObject nextEnemy = _enemyQueue.Dequeue();
+            GameObject nextEnemy =
+                _enemyQueue.Dequeue();
 
-            Debug.Log($"En cola: {_enemyQueue.Count}");
+            _enemyIdCounter++;
 
-            LeanPool.Spawn(
-                nextEnemy,
-                spawnPoint.position,
-                spawnPoint.rotation);
+            string cleanName =
+                nextEnemy.name.Replace("(Clone)", "");
+
+            OnEnemyDequeued?.Invoke();
+
+            GameObject spawnedEnemy =
+                LeanPool.Spawn(
+                    nextEnemy,
+                    spawnPoint.position,
+                    spawnPoint.rotation);
+
+            EnemyController enemyController =
+                spawnedEnemy.GetComponent<EnemyController>();
+
+            enemyController.Initialize(
+                _enemyIdCounter,
+                cleanName);
+
+            // =========================================================
+            // TRACK ALIVE ENEMIES
+            // =========================================================
+
+            _currentAliveEnemies++;
+
+            enemyController.OnEnemyRemoved +=
+                HandleEnemyRemoved;
 
             yield return _wait;
         }
+
+        OnQueueCleared?.Invoke();
+
+        CheckWaveCompleted();
+    }
+
+    // =========================================================
+    // ENEMY REMOVED
+    // =========================================================
+
+    private void HandleEnemyRemoved(
+        EnemyController enemy)
+    {
+        _currentAliveEnemies--;
+
+        enemy.OnEnemyRemoved -= HandleEnemyRemoved;
+
+        CheckWaveCompleted();
+    }
+
+    // =========================================================
+    // CHECK WAVE COMPLETED
+    // =========================================================
+
+    private void CheckWaveCompleted()
+    {
+        bool queueEmpty =
+            _enemyQueue == null ||
+            _enemyQueue.Count == 0;
+
+        bool noEnemiesAlive =
+            _currentAliveEnemies <= 0;
+
+        if (queueEmpty && noEnemiesAlive)
+        {
+            //Debug.Log("WAVE COMPLETED");
+
+            StartCoroutine(
+                NextWaveDelayRoutine());
+        }
+    }
+
+    // =========================================================
+    // SNAPSHOT
+    // =========================================================
+
+    public List<string> GetCurrentQueueSnapshot()
+    {
+        return BuildQueueSnapshot();
+    }
+
+    private List<string> BuildQueueSnapshot()
+    {
+        List<string> snapshot = new();
+
+        if (_enemyQueue == null)
+            return snapshot;
+
+        int previewId = _enemyIdCounter;
+
+        foreach (GameObject enemy in _enemyQueue)
+        {
+            previewId++;
+
+            string cleanName =
+                enemy.name.Replace("(Clone)", "");
+
+            string displayName =
+                $"{cleanName}_{previewId}";
+
+            snapshot.Add(displayName);
+        }
+
+        return snapshot;
     }
 
     private void OnDestroy()
     {
-        if (_enemyQueue != null && _enemyQueue.Count > 0)
+        if (_enemyQueue != null)
         {
             _enemyQueue.Clear();
         }
-        EnemyCounterWave.Instance.endCurrentWave -= NextWave;
     }
 }

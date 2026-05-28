@@ -15,10 +15,9 @@ public class SelectNode : MonoBehaviour, IPointerDownHandler
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (eventData.button == PointerEventData.InputButton.Left)
-        {
-            OnSelect?.Invoke();
-            _nodeScript.SelectedNode();
-        }
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+        if(_nodeScript.IsOccupied) return;
+        OnSelect?.Invoke();
+        _nodeScript.SelectedNode();
     }
 }

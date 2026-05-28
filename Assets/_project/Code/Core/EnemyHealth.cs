@@ -1,38 +1,95 @@
 using System;
+using Lean.Pool;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class EnemyHealth : MonoBehaviour, IDamage
 {
-    public EnemyDataSO enemyData;
     public Slider healthBar;
-    public event Action OnDead;
+
+    public event Action<EnemyHealth> OnDead;
 
     public float currentHealth;
-    public bool _isDied;
 
-    private EnemyAnimation _enemyAnimation;
+    public bool IsDied { get; private set; }
+
+    private EnemyAnimation enemyAnimation;
+
+    private EnemyDataSO enemyData;
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
-        _enemyAnimation = GetComponent<EnemyAnimation>();
+        enemyAnimation =
+            GetComponent<EnemyAnimation>();
     }
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
+    public void Initialize(EnemyDataSO data)
+    {
+        enemyData = data;
+
+        IsDied = false;
+
+        currentHealth =
+            enemyData.maxHealth;
+
+        healthBar.maxValue =
+            enemyData.maxHealth;
+
+        healthBar.value =
+            currentHealth;
+    }
+
+    // =========================================================
+    // DAMAGE
+    // =========================================================
 
     public void TakeDamage(float damage)
     {
-        if (_isDied) return;
+        if (enemyData == null)
+            return;
+
+        if (IsDied)
+            return;
+
         currentHealth -= damage;
+
         healthBar.value = currentHealth;
 
-        if(currentHealth <= 0.0f)
+        if (currentHealth <= 0f)
         {
-            _isDied = true;
-
-            PlayerEconomy.Instance.AddGold(enemyData.goldReward);
-
-            _enemyAnimation.DeadAnimation();
-
-            OnDead?.Invoke();
+            Die();
         }
+    }
+
+    // =========================================================
+    // DIE
+    // =========================================================
+
+    private void Die()
+    {
+        IsDied = true;
+
+        PlayerEconomy.Instance.AddGold(
+            enemyData.goldReward);
+
+        enemyAnimation.DeadAnimation();
+
+        if (enemyData.deathFX != null)
+        {
+            LeanPool.Spawn(
+                enemyData.deathFX,
+                transform.position,
+                Quaternion.identity);
+        }
+
+        OnDead?.Invoke(this);
     }
 }

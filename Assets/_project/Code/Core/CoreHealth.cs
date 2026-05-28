@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 public class CoreHealth : MonoBehaviour
 {
+    public GameObject gameOverPanel;
     public static CoreHealth Instance;
 
     public float maxHealth = 100f;
@@ -34,6 +35,8 @@ public class CoreHealth : MonoBehaviour
         if (currentHealth <= 0.0f)
         {
             OnGameOver?.Invoke();
+            gameOverPanel.SetActive(true);
+            Time.timeScale = 0;
         }
     }
 

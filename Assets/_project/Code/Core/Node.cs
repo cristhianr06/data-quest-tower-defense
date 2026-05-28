@@ -3,28 +3,31 @@ using UnityEngine;
 
 public class Node : MonoBehaviour
 {
+    //[SerializeField] private bool _isSelected;
+    [SerializeField] private bool _isOccupied;
     public GameObject selectedVfx;
-    public bool IsOccupied { get; private set; }
-    public bool IsSelected { get; private set; }
+    
 
     public static Action<Node, Transform> OnNodeSelected;
     
+    public bool IsOccupied => _isOccupied;
+
     public void SelectedNode()
     {
-        IsSelected = true;
+        //_isSelected = true;
         OnNodeSelected?.Invoke(this,  transform);
-        Debug.Log($"{gameObject.name} Selected");
+        //Debug.Log($"{gameObject.name} Selected");
     }
 
     public void DeselectedNode()
     {
-        IsSelected = false;
-        Debug.Log($"{gameObject.name} Deselected");
+        //_isSelected = false;
+        //Debug.Log($"{gameObject.name} Deselected");
     }
 
     public void SetOccupied(bool value)
     {
-        IsOccupied = value;
+        _isOccupied = value;
     }
 
     public void DisableVfx()

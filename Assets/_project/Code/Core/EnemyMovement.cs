@@ -1,82 +1,202 @@
-using PrimeTween;
 using System;
+using PrimeTween;
 using UnityEngine;
 
 public class EnemyMovement : MonoBehaviour
 {
-    private EnemyDataSO _enemyData;
-    public event Action<int> EnemyArrived;
+    public event Action EnemyArrived;
 
-    private int _currentWaypointIndex = 1;
-    private Transform[] _waypoints;
-    private Transform _transform;
-    private bool _isArrived;
-    private Tween _rotationTween;
+    public event Action<int> OnWaypointChanged;
 
-    private EnemyHealth _enemyHealth;
+    private EnemyDataSO enemyData;
+
+    private EnemyHealth enemyHealth;
+
+    private Transform[] waypoints;
+
+    private Transform cachedTransform;
+
+    private Tween rotationTween;
+
+    private bool isArrived;
+
+    private int currentWaypointIndex = 1;
+
+    // =========================================================
+    // PROPERTY
+    // =========================================================
+
+    public int CurrentWaypointIndex
+    {
+        get => currentWaypointIndex;
+
+        private set
+        {
+            if (currentWaypointIndex != value)
+            {
+                currentWaypointIndex = value;
+
+                OnWaypointChanged?.Invoke(
+                    currentWaypointIndex);
+            }
+        }
+    }
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
-        _enemyHealth = GetComponent<EnemyHealth>();
-        _enemyData = GetComponent<EnemyController>().enemyData;
-        _transform = transform;
-        _waypoints = FindFirstObjectByType<Waypoints>().wayPointsTransform;
+        enemyHealth =
+            GetComponent<EnemyHealth>();
+
+        cachedTransform = transform;
+
+        Waypoints waypointsObject =
+            FindFirstObjectByType<Waypoints>();
+
+        if (waypointsObject != null)
+        {
+            waypoints =
+                waypointsObject.wayPointsTransform;
+        }
     }
-    private void Start()
-    {
-        _currentWaypointIndex = 1;
-        _isArrived = false;
-        RotationLook();
-    }
-    public void ResetEnemy()
-    {
-        Tween.StopAll(this.transform);
-        _currentWaypointIndex = 1;
-        _isArrived = false;
-    }
+
     private void Update()
     {
         Movement();
     }
+
+    // =========================================================
+    // INITIALIZE
+    // =========================================================
+
+    public void Initialize(EnemyDataSO data)
+    {
+        enemyData = data;
+
+        CurrentWaypointIndex = 1;
+
+        isArrived = false;
+
+        RotationLook();
+    }
+
+    // =========================================================
+    // RESET
+    // =========================================================
+
+    public void ResetEnemy()
+    {
+        Tween.StopAll(cachedTransform);
+
+        CurrentWaypointIndex = 1;
+
+        isArrived = false;
+
+        cachedTransform.position =
+            waypoints[0].position;
+    }
+
+    // =========================================================
+    // MOVEMENT
+    // =========================================================
+
     private void Movement()
     {
-        if (_enemyHealth._isDied) return;
-        if (_waypoints == null || _waypoints.Length == 0 || _isArrived) return;
+        if (enemyData == null)
+            return;
 
-        _transform.position = Vector3.MoveTowards(_transform.position, _waypoints[_currentWaypointIndex].position, _enemyData.moveSpeed * Time.deltaTime);
+        if (enemyHealth.IsDied)
+            return;
 
-        float distance = (_waypoints[_currentWaypointIndex].position - _transform.position).sqrMagnitude;
-
-        if (distance <= _enemyData.toleranceDistance * _enemyData.toleranceDistance)
+        if (waypoints == null ||
+            waypoints.Length == 0 ||
+            isArrived)
         {
-            if (_currentWaypointIndex >= _waypoints.Length - 1)
+            return;
+        }
+
+        if (currentWaypointIndex >= waypoints.Length)
+            return;
+
+        cachedTransform.position =
+            Vector3.MoveTowards(
+                cachedTransform.position,
+                waypoints[currentWaypointIndex].position,
+                enemyData.moveSpeed * Time.deltaTime);
+
+        float distance =
+            (waypoints[currentWaypointIndex].position -
+             cachedTransform.position)
+            .sqrMagnitude;
+
+        if (distance <=
+            enemyData.toleranceDistance *
+            enemyData.toleranceDistance)
+        {
+            if (currentWaypointIndex >=
+                waypoints.Length - 1)
             {
-                Debug.Log($"Llego: {gameObject.name}");
-                _isArrived = true;
-                EnemyArrived?.Invoke(1);
-                CoreHealth.Instance.TakeDamage(_enemyData.damageToCore);
+                isArrived = true;
+
+                EnemyArrived?.Invoke();
+
+                CoreHealth.Instance.TakeDamage(
+                    enemyData.damageToCore);
+
                 return;
             }
-            _currentWaypointIndex++;
+
+            CurrentWaypointIndex++;
+
             RotationLook();
         }
     }
+
+    // =========================================================
+    // ROTATION
+    // =========================================================
+
     private void RotationLook()
     {
-        if (_isArrived) return;
+        if (enemyData == null)
+            return;
 
-        if (_rotationTween.isAlive)
+        if (isArrived)
+            return;
+
+        if (waypoints == null ||
+            waypoints.Length == 0)
         {
-            _rotationTween.Stop();
+            return;
         }
-        Vector3 direction = (_waypoints[_currentWaypointIndex].position - _transform.position).normalized;
 
-        Quaternion look = Quaternion.LookRotation(direction);
+        if (currentWaypointIndex >= waypoints.Length)
+            return;
 
-        _rotationTween = Tween.Rotation(
-            _transform,
-            look,
-            _enemyData.rotationSpeed,
-            Ease.OutQuad);
+        if (rotationTween.isAlive)
+        {
+            rotationTween.Stop();
+        }
+
+        Vector3 direction =
+            (waypoints[currentWaypointIndex].position -
+             cachedTransform.position)
+            .normalized;
+
+        if (direction == Vector3.zero)
+            return;
+
+        Quaternion look =
+            Quaternion.LookRotation(direction);
+
+        rotationTween =
+            Tween.Rotation(
+                cachedTransform,
+                look,
+                enemyData.rotationSpeed,
+                Ease.OutQuad);
     }
 }

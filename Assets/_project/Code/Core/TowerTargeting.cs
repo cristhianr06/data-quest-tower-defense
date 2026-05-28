@@ -1,23 +1,56 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Lean.Pool;
 
 public class TowerTargeting : MonoBehaviour
 {
+    [SerializeField] private GameObject towerArea;
+
+    public GameObject TowerArea => towerArea;
+
     public TowerDataSO towerData;
 
     public Transform shootPoint;
 
-    private float _fireCountdown;
+    // =========================================================
+    // OWNER
+    // =========================================================
+
+    public Tower OwnerTower { get; private set; }
+
+    // =========================================================
+    // EVENTS
+    // =========================================================
+
+    public event Action<EnemyHealth> OnEnemyAdded;
+
+    public event Action<EnemyHealth> OnEnemyRemoved;
+
+    // =========================================================
+    // TARGETING
+    // =========================================================
+
+    private float fireCountdown;
 
     public List<EnemyHealth> enemiesInRange = new();
 
-    private EnemyHealth _currentTarget;
+    private EnemyHealth currentTarget;
+
+    // =========================================================
+    // SET OWNER
+    // =========================================================
+
+    public void SetOwnerTower(Tower tower)
+    {
+        OwnerTower = tower;
+    }
 
     private void Update()
     {
         UpdateTarget();
 
-        if (_currentTarget == null)
+        if (currentTarget == null)
             return;
 
         RotateToTarget();
@@ -27,53 +60,60 @@ public class TowerTargeting : MonoBehaviour
 
     private void UpdateTarget()
     {
-        enemiesInRange.RemoveAll(e => e == null || e._isDied);
-
         if (enemiesInRange.Count == 0)
         {
-            _currentTarget = null;
+            currentTarget = null;
             return;
         }
 
-        _currentTarget = enemiesInRange[0];
+        currentTarget = enemiesInRange[0];
     }
 
     private void HandleShooting()
     {
-        _fireCountdown -= Time.deltaTime;
+        fireCountdown -= Time.deltaTime;
 
-        if (_fireCountdown <= 0f)
+        if (fireCountdown <= 0f)
         {
             Shoot();
 
-            _fireCountdown = 1f / towerData.fireRate;
+            fireCountdown =
+                1f / towerData.fireRate;
         }
     }
 
     private void Shoot()
     {
-        GameObject projectileObj = Lean.Pool.LeanPool.Spawn(
-            towerData.projectilePrefab,
-            shootPoint.position,
-            Quaternion.identity);
+        GameObject projectileObj =
+            LeanPool.Spawn(
+                towerData.projectilePrefab,
+                shootPoint.position,
+                Quaternion.identity);
 
-        Projectile projectile = projectileObj.GetComponent<Projectile>();
+        Projectile projectile =
+            projectileObj.GetComponent<Projectile>();
 
-        projectile.SetTarget(_currentTarget.transform, towerData.damage);
+        projectile.SetTarget(
+            currentTarget.transform,
+            towerData.damage);
     }
 
     private void RotateToTarget()
     {
-        Vector3 direction = _currentTarget.transform.position - transform.position;
+        Vector3 direction =
+            currentTarget.transform.position -
+            transform.position;
 
         direction.y = 0;
 
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        Quaternion lookRotation =
+            Quaternion.LookRotation(direction);
 
-        transform.rotation = Quaternion.Lerp(
-            transform.rotation,
-            lookRotation,
-            Time.deltaTime * 10f);
+        transform.rotation =
+            Quaternion.Lerp(
+                transform.rotation,
+                lookRotation,
+                Time.deltaTime * 10f);
     }
 
     private void OnTriggerEnter(Collider other)
@@ -83,6 +123,10 @@ public class TowerTargeting : MonoBehaviour
             if (!enemiesInRange.Contains(enemy))
             {
                 enemiesInRange.Add(enemy);
+
+                enemy.OnDead += HandleEnemyDeath;
+
+                OnEnemyAdded?.Invoke(enemy);
             }
         }
     }
@@ -91,14 +135,30 @@ public class TowerTargeting : MonoBehaviour
     {
         if (other.TryGetComponent(out EnemyHealth enemy))
         {
+            enemy.OnDead -= HandleEnemyDeath;
+
             enemiesInRange.Remove(enemy);
+
+            OnEnemyRemoved?.Invoke(enemy);
         }
+    }
+
+    private void HandleEnemyDeath(
+        EnemyHealth enemy)
+    {
+        enemy.OnDead -= HandleEnemyDeath;
+
+        enemiesInRange.Remove(enemy);
+
+        OnEnemyRemoved?.Invoke(enemy);
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
 
-        Gizmos.DrawWireSphere(transform.position, towerData.range);
+        Gizmos.DrawWireSphere(
+            transform.position,
+            towerData.range);
     }
 }

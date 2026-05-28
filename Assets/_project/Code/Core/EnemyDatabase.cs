@@ -5,6 +5,9 @@ using UnityEngine;
 public class EnemyDatabase : MonoBehaviour
 {
     public static EnemyDatabase Instance;
+    public EnemyType LastLookupType { get; private set; }
+
+    public EnemyDataSO LastLookupData { get; private set; }
 
     [Header("Enemy Configurations")]
     [SerializeField]
@@ -93,21 +96,29 @@ public class EnemyDatabase : MonoBehaviour
     {
         if (enemyDictionary.TryGetValue(
                 enemyType,
-                out EnemyDataSO enemyData))
+                out EnemyDataSO data))
         {
             // =====================================================
-            // REAL-TIME LOOKUP EVENT
+            // CACHE LAST LOOKUP
+            // =====================================================
+
+            LastLookupType = enemyType;
+
+            LastLookupData = data;
+
+            // =====================================================
+            // EVENT
             // =====================================================
 
             OnDictionaryLookup?.Invoke(
                 enemyType,
-                enemyData);
+                data);
 
-            return enemyData;
+            return data;
         }
 
-        Debug.LogError(
-            $"EnemyData not found for type: {enemyType}");
+        Debug.LogWarning(
+            $"EnemyType {enemyType} not found");
 
         return null;
     }

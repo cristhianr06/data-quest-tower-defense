@@ -423,7 +423,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: bfe3f0173dd87694d8386eb0cbb1ed51, type: 3}
       propertyPath: m_Name
-      value: tower-canon
+      value: "Torre_Ca\xF1on"
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: bfe3f0173dd87694d8386eb0cbb1ed51, type: 3}
       propertyPath: m_Layer
@@ -471,7 +471,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Tower
   towerDataSO: {fileID: 11400000, guid: a6487b0a095a24443b5868e1f582dfa7, type: 2}
-  currentNode: {fileID: 0}
 --- !u!65 &7571555309879341792
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -505,6 +504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c2cd79188808934a9a1146e09bb2a2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SelectTower
+  _selectSound: {fileID: 8300000, guid: 5acb2ed8ebe40cc4c849e5c8feafd3d0, type: 3}
 --- !u!4 &1859453728442659474 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: bfe3f0173dd87694d8386eb0cbb1ed51, type: 3}

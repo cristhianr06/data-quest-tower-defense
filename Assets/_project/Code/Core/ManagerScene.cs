@@ -32,7 +32,7 @@ public class ManagerScene : MonoBehaviour
     public void Close()
     {
         Debug.Log("Close");
-        //Application.Quit();
+        Application.Quit();
     }
 
     private void Pause(InputAction.CallbackContext context)

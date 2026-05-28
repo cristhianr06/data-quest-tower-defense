@@ -18,4 +18,4 @@ MonoBehaviour:
   range: 2.8
   cost: 75
   projectilePrefab: {fileID: 8490014886952267208, guid: 3376dfee8ddc8364eb39307cfab5660c, type: 3}
-  shootSFX: {fileID: 8300000, guid: ed167a2b21a15ff489542578edb5ac3d, type: 3}
+  shootSFX: {fileID: 8300000, guid: d9419ba0bfac1e84a95418ac5851caf6, type: 3}

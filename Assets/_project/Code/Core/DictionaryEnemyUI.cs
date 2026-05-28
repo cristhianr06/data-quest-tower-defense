@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,18 +15,15 @@ public class DictionaryEnemyUI : MonoBehaviour
     [SerializeField]
     private Button closeButton;
 
-    [Header("Dictionary Content")]
-    [SerializeField]
-    private Transform dictionaryContent;
-
-    //[SerializeField] private TextMeshProUGUI dictionaryTextPrefab;
-
     [Header("Runtime Lookup")]
     [SerializeField]
     private TextMeshProUGUI runtimeLookupTMP;
 
-    private readonly List<TextMeshProUGUI>
-        spawnedTexts = new();
+    private bool isSubscribed;
+
+    // =========================================================
+    // UNITY
+    // =========================================================
 
     private void Awake()
     {
@@ -38,22 +34,46 @@ public class DictionaryEnemyUI : MonoBehaviour
             ClosePanel);
     }
 
-    private void OnEnable()
+    private void Start()
     {
+        SubscribeToDatabase();
+    }
+
+    private void OnDestroy()
+    {
+        UnsubscribeFromDatabase();
+    }
+
+    // =========================================================
+    // SUBSCRIBE
+    // =========================================================
+
+    private void SubscribeToDatabase()
+    {
+        if (isSubscribed)
+            return;
+
         if (EnemyDatabase.Instance == null)
             return;
 
         EnemyDatabase.Instance.OnDictionaryLookup +=
             HandleLookup;
+
+        isSubscribed = true;
     }
 
-    private void OnDisable()
+    private void UnsubscribeFromDatabase()
     {
+        if (!isSubscribed)
+            return;
+
         if (EnemyDatabase.Instance == null)
             return;
 
         EnemyDatabase.Instance.OnDictionaryLookup -=
             HandleLookup;
+
+        isSubscribed = false;
     }
 
     // =========================================================
@@ -64,59 +84,40 @@ public class DictionaryEnemyUI : MonoBehaviour
     {
         dictionaryPanel.SetActive(true);
 
-        //BuildDictionaryUI();
+        RefreshLastLookup();
     }
 
     private void ClosePanel()
     {
         dictionaryPanel.SetActive(false);
 
-        ClearUI();
-
         runtimeLookupTMP.text = "";
     }
 
     // =========================================================
-    // BUILD STATIC DICTIONARY
+    // REFRESH
     // =========================================================
 
-    // private void BuildDictionaryUI()
-    // {
-    //     ClearUI();
-    //
-    //     IReadOnlyDictionary<EnemyType, EnemyDataSO>dictionary = EnemyDatabase.Instance.EnemyDictionary;
-    //
-    //     foreach (
-    //         KeyValuePair<EnemyType, EnemyDataSO>
-    //         pair in dictionary)
-    //     {
-    //         CreateDictionaryEntry(pair);
-    //     }
-    // }
+    private void RefreshLastLookup()
+    {
+        if (EnemyDatabase.Instance == null)
+            return;
 
-    // private void CreateDictionaryEntry(
-    //     KeyValuePair<EnemyType, EnemyDataSO>
-    //     pair)
-    // {
-    //     TextMeshProUGUI textInstance =
-    //         Instantiate(
-    //             dictionaryTextPrefab,
-    //             dictionaryContent);
-    //
-    //     EnemyDataSO data = pair.Value;
-    //
-    //     textInstance.text =
-    //         $"KEY -> {pair.Key}\n" +
-    //         $"VALUE\n" +
-    //         $"Vida: {data.maxHealth}\n" +
-    //         $"Velocidad: {data.moveSpeed} m/s\n" +
-    //         $"Oro: {data.goldReward}";
-    //
-    //     spawnedTexts.Add(textInstance);
-    // }
+        if (EnemyDatabase.Instance.LastLookupData == null)
+        {
+            runtimeLookupTMP.text =
+                "Esperando consultas al diccionario...";
+                
+            return;
+        }
+
+        UpdateLookupUI(
+            EnemyDatabase.Instance.LastLookupType,
+            EnemyDatabase.Instance.LastLookupData);
+    }
 
     // =========================================================
-    // REAL-TIME LOOKUP
+    // REALTIME LOOKUP
     // =========================================================
 
     private void HandleLookup(
@@ -126,29 +127,24 @@ public class DictionaryEnemyUI : MonoBehaviour
         if (!dictionaryPanel.activeSelf)
             return;
 
+        UpdateLookupUI(
+            enemyType,
+            enemyData);
+    }
+
+    // =========================================================
+    // UI
+    // =========================================================
+
+    private void UpdateLookupUI(
+        EnemyType enemyType,
+        EnemyDataSO enemyData)
+    {
         runtimeLookupTMP.text =
             $"Tipo de enemigo (KEY): {enemyType}\n" +
             $"Datos encontrados:\n" +
             $"Vida: {enemyData.maxHealth}\n" +
             $"Velocidad: {enemyData.moveSpeed} m/s\n" +
             $"Oro: {enemyData.goldReward}";
-    }
-
-    // =========================================================
-    // CLEAR
-    // =========================================================
-
-    private void ClearUI()
-    {
-        for (int i = 0; i < spawnedTexts.Count; i++)
-        {
-            if (spawnedTexts[i] != null)
-            {
-                Destroy(
-                    spawnedTexts[i].gameObject);
-            }
-        }
-
-        spawnedTexts.Clear();
     }
 }

@@ -19,6 +19,5 @@ MonoBehaviour:
   toleranceDistance: 0.1
   goldReward: 10
   damageToCore: 10
-  attackResistance: 10
-  deathSFX: {fileID: 8300000, guid: 4ddf5cea35950164388707d53947bd46, type: 3}
+  deathSFX: {fileID: 8300000, guid: 1b1df10ede0d6ec46899747b2b8c7e73, type: 3}
   deathFX: {fileID: 6777932572600773440, guid: 5d2644491bc826942a3f6cbf3a175d78, type: 3}

@@ -3,8 +3,9 @@ using UnityEngine;
 public class Tower : MonoBehaviour
 {
     [SerializeField] private TowerDataSO towerDataSO;
+    
 
-    [SerializeField] private Node currentNode;
+    private Node currentNode;
 
     // =========================================================
     // IDENTITY

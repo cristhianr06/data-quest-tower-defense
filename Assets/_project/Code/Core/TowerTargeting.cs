@@ -12,6 +12,7 @@ public class TowerTargeting : MonoBehaviour
     public TowerDataSO towerData;
 
     public Transform shootPoint;
+    private AudioSource _audioSource;
 
     // =========================================================
     // OWNER
@@ -40,6 +41,10 @@ public class TowerTargeting : MonoBehaviour
     // =========================================================
     // SET OWNER
     // =========================================================
+    private void Awake()
+    {
+        _audioSource = GetComponent<AudioSource>();
+    }
 
     public void SetOwnerTower(Tower tower)
     {
@@ -84,6 +89,7 @@ public class TowerTargeting : MonoBehaviour
 
     private void Shoot()
     {
+        _audioSource.PlayOneShot(towerData.shootSFX);
         GameObject projectileObj =
             LeanPool.Spawn(
                 towerData.projectilePrefab,

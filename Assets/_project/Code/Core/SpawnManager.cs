@@ -12,6 +12,8 @@ public class SpawnManager : MonoBehaviour
     [SerializeField] private float delayBetweenWaves = 5f;
 
     public TextMeshProUGUI counterWaveTMP;
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _spawnClip;
 
     public static SpawnManager Instance;
 
@@ -133,7 +135,6 @@ public class SpawnManager : MonoBehaviour
     // =========================================================
     // SPAWN ROUTINE
     // =========================================================
-
     private IEnumerator SpawnRoutine()
     {
         while (_enemyQueue.Count > 0)
@@ -146,7 +147,27 @@ public class SpawnManager : MonoBehaviour
             string cleanName =
                 nextEnemy.name.Replace("(Clone)", "");
 
+            // =====================================================
+            // UPDATE UI FIFO
+            // =====================================================
+
             OnEnemyDequeued?.Invoke();
+
+            // =====================================================
+            // PLAY SPAWN SOUND FIRST
+            // =====================================================
+
+            if (_spawnClip != null)
+            {
+                _audioSource.PlayOneShot(_spawnClip);
+
+                yield return new WaitForSeconds(
+                    _spawnClip.length - 0.5f);
+            }
+
+            // =====================================================
+            // SPAWN ENEMY AFTER SOUND
+            // =====================================================
 
             GameObject spawnedEnemy =
                 LeanPool.Spawn(
@@ -161,14 +182,18 @@ public class SpawnManager : MonoBehaviour
                 _enemyIdCounter,
                 cleanName);
 
-            // =========================================================
-            // TRACK ALIVE ENEMIES
-            // =========================================================
+            // =====================================================
+            // TRACK ACTIVE ENEMIES
+            // =====================================================
 
             _currentAliveEnemies++;
 
             enemyController.OnEnemyRemoved +=
                 HandleEnemyRemoved;
+
+            // =====================================================
+            // WAIT BETWEEN ENEMIES
+            // =====================================================
 
             yield return _wait;
         }

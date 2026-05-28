@@ -16,6 +16,7 @@ public class EnemyHealth : MonoBehaviour, IDamage
     private EnemyAnimation enemyAnimation;
 
     private EnemyDataSO enemyData;
+    private AudioSource _audioSource;
 
     // =========================================================
     // UNITY
@@ -23,8 +24,8 @@ public class EnemyHealth : MonoBehaviour, IDamage
 
     private void Awake()
     {
-        enemyAnimation =
-            GetComponent<EnemyAnimation>();
+        enemyAnimation = GetComponent<EnemyAnimation>();
+        _audioSource = GetComponent<AudioSource>();
     }
 
     // =========================================================
@@ -60,9 +61,8 @@ public class EnemyHealth : MonoBehaviour, IDamage
             return;
 
         currentHealth -= damage;
-
         healthBar.value = currentHealth;
-
+        _audioSource.PlayOneShot(enemyData.deathSFX);
         if (currentHealth <= 0f)
         {
             Die();

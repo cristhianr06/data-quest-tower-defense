@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class CoreHealth : MonoBehaviour
 {
+    [SerializeField] private GameObject _damageParticlesPrefab;
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _damageSound;
     public GameObject gameOverPanel;
     public static CoreHealth Instance;
 
@@ -14,10 +17,13 @@ public class CoreHealth : MonoBehaviour
     public Slider healthBar;
 
     public event Action OnGameOver;
+    private ParticleSystem _damageParticle;
 
     private void Awake()
     {
         Instance = this;
+        _damageParticlesPrefab.SetActive(false);
+        _damageParticle = _damageParticlesPrefab.GetComponent<ParticleSystem>();
     }
 
     private void Start()
@@ -30,6 +36,9 @@ public class CoreHealth : MonoBehaviour
     public void TakeDamage(float damage)
     {
         currentHealth -= damage;
+        _audioSource.PlayOneShot(_damageSound);
+        _damageParticlesPrefab.SetActive(true);
+        _damageParticle.Play();
         UpdateUI();
 
         if (currentHealth <= 0.0f)

@@ -6,21 +6,21 @@ using UnityEngine.UI;
 public class PlacementTowerManager : MonoBehaviour
 {
     public static PlacementTowerManager Instance;
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip _spawnClip;
+    [SerializeField] private AudioClip _destroyClip;
+    [SerializeField] private GameObject _destroyParticles;
 
-    [Header("Menu")]
-    public GameObject menuTower;
+    [Header("Menu")] public GameObject menuTower;
 
-    [Header("Tower Data")]
-    public TowerDataSO crossbowData;
+    [Header("Tower Data")] public TowerDataSO crossbowData;
     public TowerDataSO cannonData;
 
-    [Header("Buttons")]
-    public Button crossbowButton;
+    [Header("Buttons")] public Button crossbowButton;
     public Button cannonButton;
     public Button removeTowerButton;
 
-    [Header("Prefabs")]
-    public GameObject crossbowPrefab;
+    [Header("Prefabs")] public GameObject crossbowPrefab;
     public GameObject cannonPrefab;
 
     private Node currentSelectedNode;
@@ -80,15 +80,12 @@ public class PlacementTowerManager : MonoBehaviour
 
     private void Start()
     {
-        removeTowerButton.gameObject.SetActive(
-            towerStack.Count > 0);
+        removeTowerButton.gameObject.SetActive(towerStack.Count > 0);
 
         BuildStackSnapshot();
     }
 
-    private void HandleNodeSelected(
-        Node node,
-        Transform nodeTransform)
+    private void HandleNodeSelected(Node node,Transform nodeTransform)
     {
         if (currentSelectedNode != null)
         {
@@ -102,9 +99,7 @@ public class PlacementTowerManager : MonoBehaviour
 
     private void CreateCrossbowTower()
     {
-        CreateTower(
-            crossbowPrefab,
-            crossbowData.cost);
+        CreateTower(crossbowPrefab, crossbowData.cost);
     }
 
     private void CreateCannonTower()
@@ -148,6 +143,7 @@ public class PlacementTowerManager : MonoBehaviour
 
         Tower tower =
             currentTower.GetComponent<Tower>();
+        _audioSource.PlayOneShot(_spawnClip);
 
         _towerIdCounter++;
 
@@ -195,25 +191,22 @@ public class PlacementTowerManager : MonoBehaviour
         // POP STACK (LIFO)
         // =========================================================
 
-        GameObject lastTower =
-            towerStack.Pop();
+        GameObject lastTower = towerStack.Pop();
 
-        Tower tower =
-            lastTower.GetComponent<Tower>();
+        Tower tower = lastTower.GetComponent<Tower>();
 
         tower.CurrentNode.SetOccupied(false);
 
-        PlayerEconomy.Instance.AddGold(
-            tower.TowerDataSo.cost / 2);
+        PlayerEconomy.Instance.AddGold(tower.TowerDataSo.cost / 2);
 
-        removeTowerButton.gameObject.SetActive(
-            towerStack.Count > 0);
+        removeTowerButton.gameObject.SetActive(towerStack.Count > 0);
 
         OnTowerPopped?.Invoke();
 
         //Debug.Log($"POP -> {lastTower.name}");
-
+        Instantiate(_destroyParticles, new Vector3(tower.transform.position.x, tower.transform.position.y + 0.3f, tower.transform.position.z), Quaternion.identity);
         Destroy(lastTower);
+        _audioSource.PlayOneShot(_destroyClip);
     }
 
     // =========================================================

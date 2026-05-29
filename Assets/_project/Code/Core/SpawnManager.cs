@@ -7,13 +7,21 @@ using TMPro;
 
 public class SpawnManager : MonoBehaviour
 {
-    [SerializeField] private float delayStartFirstWave = 2f;
-
+    [Header("Wave Delay")]
     [SerializeField] private float delayBetweenWaves = 5f;
 
-    public TextMeshProUGUI counterWaveTMP;
-    [SerializeField] private AudioSource _audioSource;
-    [SerializeField] private AudioClip _spawnClip;
+    [Header("Countdown")]
+    [SerializeField] private int countdownSeconds = 3;
+
+    [Header("UI")]
+    [SerializeField] private TextMeshProUGUI waveTMP;
+
+    [SerializeField] private TextMeshProUGUI countdownTMP;
+
+    [Header("Audio")]
+    [SerializeField] private AudioSource audioSource;
+
+    [SerializeField] private AudioClip spawnClip;
 
     public static SpawnManager Instance;
 
@@ -23,25 +31,21 @@ public class SpawnManager : MonoBehaviour
     [Header("Spawn")]
     public Transform spawnPoint;
 
-    private Queue<GameObject> _enemyQueue;
+    private Queue<GameObject> enemyQueue;
 
-    private WaitForSeconds _wait;
+    private WaitForSeconds waitEnemySpawn;
 
-    private WaitForSeconds _waitBetweenWaves;
+    private int currentWaveIndex = 0;
 
-    private WaitForSeconds _waitFirstWave;
+    private int enemyIdCounter = 0;
 
-    private int _currentWaveIndex = 0;
-
-    private int _enemyIdCounter = 0;
-
-    private int _enemyAmountWave;
+    private int enemyAmountWave;
 
     // =========================================================
     // ACTIVE ENEMIES
     // =========================================================
 
-    private int _currentAliveEnemies = 0;
+    private int currentAliveEnemies = 0;
 
     // =========================================================
     // EVENTS
@@ -53,34 +57,74 @@ public class SpawnManager : MonoBehaviour
 
     public event Action OnQueueCleared;
 
+    // =========================================================
+    // UNITY
+    // =========================================================
+
     private void Awake()
     {
         Instance = this;
 
-        _waitBetweenWaves =
-            new WaitForSeconds(delayBetweenWaves);
-
-        _waitFirstWave =
-            new WaitForSeconds(delayStartFirstWave);
+        if (countdownTMP != null)
+        {
+            countdownTMP.gameObject.SetActive(false);
+        }
     }
 
     private void Start()
     {
-        StartCoroutine(PrepareWaveRoutine());
+        StartCoroutine(StartFirstWaveRoutine());
     }
 
-    private IEnumerator PrepareWaveRoutine()
+    // =========================================================
+    // FIRST WAVE
+    // =========================================================
+
+    private IEnumerator StartFirstWaveRoutine()
     {
-        yield return _waitFirstWave;
+        yield return StartCoroutine(
+            CountdownRoutine());
 
         NextWave();
     }
+
+    // =========================================================
+    // NEXT WAVE DELAY
+    // =========================================================
 
     private IEnumerator NextWaveDelayRoutine()
     {
-        yield return _waitBetweenWaves;
+        yield return new WaitForSeconds(
+            delayBetweenWaves);
+
+        yield return StartCoroutine(
+            CountdownRoutine());
 
         NextWave();
+    }
+
+    // =========================================================
+    // COUNTDOWN
+    // =========================================================
+
+    private IEnumerator CountdownRoutine()
+    {
+        if (countdownTMP == null)
+            yield break;
+
+        countdownTMP.gameObject.SetActive(true);
+
+        for (int i = countdownSeconds; i > 0; i--)
+        {
+            countdownTMP.text = i.ToString();
+
+            yield return new WaitForSeconds(1f);
+        }
+        countdownTMP.text = $"¡INICIA LA OLEADA! {currentWaveIndex + 1}";
+
+        yield return new WaitForSeconds(1f);
+
+        countdownTMP.gameObject.SetActive(false);
     }
 
     // =========================================================
@@ -89,63 +133,78 @@ public class SpawnManager : MonoBehaviour
 
     private void NextWave()
     {
-        _enemyAmountWave = 0;
+        enemyAmountWave = 0;
 
         if (listWave == null || listWave.Length == 0)
             return;
 
-        if (_currentWaveIndex >= listWave.Length)
+        if (currentWaveIndex >= listWave.Length)
         {
             Debug.Log("ALL WAVES COMPLETED");
+
+            if (countdownTMP != null)
+            {
+                countdownTMP.gameObject.SetActive(true);
+
+                countdownTMP.text =
+                    "¡TODAS LAS OLEADAS COMPLETADAS!";
+            }
+
             return;
         }
 
-        counterWaveTMP.text =
-            $"Oleada: {_currentWaveIndex + 1}";
+        if (waveTMP != null)
+        {
+            waveTMP.text =
+                $"Oleada: {currentWaveIndex + 1}";
+        }
 
-        // =========================================================
+        // =====================================================
         // CREATE FIFO QUEUE
-        // =========================================================
+        // =====================================================
 
-        _enemyQueue = new Queue<GameObject>(
-            listWave[_currentWaveIndex].enemiesInWave);
+        enemyQueue = new Queue<GameObject>(
+            listWave[currentWaveIndex].enemiesInWave);
 
-        _wait = new WaitForSeconds(
-            listWave[_currentWaveIndex].spawnInterval);
+        waitEnemySpawn = new WaitForSeconds(
+            listWave[currentWaveIndex].spawnInterval);
 
-        _enemyAmountWave = _enemyQueue.Count;
+        enemyAmountWave = enemyQueue.Count;
 
-        // =========================================================
+        // =====================================================
         // BUILD UI SNAPSHOT
-        // =========================================================
+        // =====================================================
 
         List<string> queueSnapshot =
             BuildQueueSnapshot();
 
         OnQueueCreated?.Invoke(
             queueSnapshot,
-            _currentWaveIndex,
-            _enemyAmountWave);
+            currentWaveIndex,
+            enemyAmountWave);
 
         StartCoroutine(SpawnRoutine());
 
-        _currentWaveIndex++;
+        currentWaveIndex++;
     }
 
     // =========================================================
     // SPAWN ROUTINE
     // =========================================================
+
     private IEnumerator SpawnRoutine()
     {
-        while (_enemyQueue.Count > 0)
+        while (enemyQueue.Count > 0)
         {
             GameObject nextEnemy =
-                _enemyQueue.Dequeue();
+                enemyQueue.Dequeue();
 
-            _enemyIdCounter++;
+            enemyIdCounter++;
 
             string cleanName =
-                nextEnemy.name.Replace("(Clone)", "");
+                nextEnemy.name.Replace(
+                    "(Clone)",
+                    "");
 
             // =====================================================
             // UPDATE UI FIFO
@@ -157,12 +216,14 @@ public class SpawnManager : MonoBehaviour
             // PLAY SPAWN SOUND FIRST
             // =====================================================
 
-            if (_spawnClip != null)
+            if (spawnClip != null &&
+                audioSource != null)
             {
-                _audioSource.PlayOneShot(_spawnClip);
+                audioSource.PlayOneShot(
+                    spawnClip);
 
                 yield return new WaitForSeconds(
-                    _spawnClip.length - 0.5f);
+                    spawnClip.length - 0.5f);
             }
 
             // =====================================================
@@ -179,14 +240,14 @@ public class SpawnManager : MonoBehaviour
                 spawnedEnemy.GetComponent<EnemyController>();
 
             enemyController.Initialize(
-                _enemyIdCounter,
+                enemyIdCounter,
                 cleanName);
 
             // =====================================================
             // TRACK ACTIVE ENEMIES
             // =====================================================
 
-            _currentAliveEnemies++;
+            currentAliveEnemies++;
 
             enemyController.OnEnemyRemoved +=
                 HandleEnemyRemoved;
@@ -195,7 +256,7 @@ public class SpawnManager : MonoBehaviour
             // WAIT BETWEEN ENEMIES
             // =====================================================
 
-            yield return _wait;
+            yield return waitEnemySpawn;
         }
 
         OnQueueCleared?.Invoke();
@@ -210,9 +271,10 @@ public class SpawnManager : MonoBehaviour
     private void HandleEnemyRemoved(
         EnemyController enemy)
     {
-        _currentAliveEnemies--;
+        currentAliveEnemies--;
 
-        enemy.OnEnemyRemoved -= HandleEnemyRemoved;
+        enemy.OnEnemyRemoved -=
+            HandleEnemyRemoved;
 
         CheckWaveCompleted();
     }
@@ -224,16 +286,14 @@ public class SpawnManager : MonoBehaviour
     private void CheckWaveCompleted()
     {
         bool queueEmpty =
-            _enemyQueue == null ||
-            _enemyQueue.Count == 0;
+            enemyQueue == null ||
+            enemyQueue.Count == 0;
 
         bool noEnemiesAlive =
-            _currentAliveEnemies <= 0;
+            currentAliveEnemies <= 0;
 
         if (queueEmpty && noEnemiesAlive)
         {
-            //Debug.Log("WAVE COMPLETED");
-
             StartCoroutine(
                 NextWaveDelayRoutine());
         }
@@ -252,17 +312,19 @@ public class SpawnManager : MonoBehaviour
     {
         List<string> snapshot = new();
 
-        if (_enemyQueue == null)
+        if (enemyQueue == null)
             return snapshot;
 
-        int previewId = _enemyIdCounter;
+        int previewId = enemyIdCounter;
 
-        foreach (GameObject enemy in _enemyQueue)
+        foreach (GameObject enemy in enemyQueue)
         {
             previewId++;
 
             string cleanName =
-                enemy.name.Replace("(Clone)", "");
+                enemy.name.Replace(
+                    "(Clone)",
+                    "");
 
             string displayName =
                 $"{cleanName}_{previewId}";
@@ -273,11 +335,15 @@ public class SpawnManager : MonoBehaviour
         return snapshot;
     }
 
+    // =========================================================
+    // DESTROY
+    // =========================================================
+
     private void OnDestroy()
     {
-        if (_enemyQueue != null)
+        if (enemyQueue != null)
         {
-            _enemyQueue.Clear();
+            enemyQueue.Clear();
         }
     }
 }
